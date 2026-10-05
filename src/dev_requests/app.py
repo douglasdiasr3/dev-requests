@@ -8,15 +8,15 @@ from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Footer, Header, Label
 
-from reqresp.history import DEFAULT_PATH, History
-from reqresp.http_client import send
-from reqresp.widgets.history_list import HistoryList
-from reqresp.widgets.request_panel import RequestPanel
-from reqresp.widgets.response_panel import ResponsePanel
+from dev_requests.history import DEFAULT_PATH, History
+from dev_requests.http_client import send
+from dev_requests.widgets.history_list import HistoryList
+from dev_requests.widgets.request_panel import RequestPanel
+from dev_requests.widgets.response_panel import ResponsePanel
 
 
-class ReqRespApp(App):
-    TITLE = "reqresp"
+class DevRequestsApp(App):
+    TITLE = "dev_requests"
     SUB_TITLE = "cliente HTTP"
     CSS_PATH = "app.tcss"
     BINDINGS = [

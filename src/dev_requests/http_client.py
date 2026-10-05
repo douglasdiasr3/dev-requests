@@ -5,7 +5,7 @@ import time
 
 import httpx
 
-from reqresp.models import RequestSpec, ResponseData
+from dev_requests.models import RequestSpec, ResponseData
 
 TIMEOUT = 30.0
 

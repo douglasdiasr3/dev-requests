@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "reqresp"
+name = "dev_requests"
 version = "0.1.0"
-description = "Cliente HTTP simplificado no terminal (estilo Insomnia)"
+description = "Cliente HTTP simplificado no estilo do Insomnia (navegador e terminal)"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -20,11 +20,11 @@ dependencies = [
 dev = ["pytest", "pytest-asyncio", "respx"]
 
 [project.scripts]
-reqresp = "reqresp.web.server:main"
-reqresp-tui = "reqresp.__main__:main"
+dev_requests = "dev_requests.web.server:main"
+dev_requests_tui = "dev_requests.__main__:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/reqresp"]
+packages = ["src/dev_requests"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

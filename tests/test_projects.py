@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from reqresp.models import RequestSpec
-from reqresp.projects import Environment, Project, ProjectStore, SavedRequest, Variable
+from dev_requests.models import RequestSpec
+from dev_requests.projects import Environment, Project, ProjectStore, SavedRequest, Variable
 
 
 @pytest.fixture
@@ -71,3 +71,25 @@ def test_globals_roundtrip(store):
     assert store.get_globals() == []
     store.save_globals([Variable("nome", "ana")])
     assert store.get_globals() == [Variable("nome", "ana")]
+
+
+def test_migrate_legacy_dir_copia_e_mantem_a_antiga(tmp_path):
+    from dev_requests.projects import migrate_legacy_dir
+
+    legacy, base = tmp_path / ".reqresp", tmp_path / ".dev_requests"
+    (legacy / "projects").mkdir(parents=True)
+    (legacy / "projects" / "abc.json").write_text("{}")
+    assert migrate_legacy_dir(base, legacy) is True
+    assert (base / "projects" / "abc.json").read_text() == "{}"
+    assert (legacy / "projects" / "abc.json").exists()
+    # Já migrado: não copia de novo nem sobrescreve.
+    (base / "projects" / "abc.json").write_text('{"novo": 1}')
+    assert migrate_legacy_dir(base, legacy) is False
+    assert (base / "projects" / "abc.json").read_text() == '{"novo": 1}'
+
+
+def test_migrate_legacy_dir_sem_pasta_antiga(tmp_path):
+    from dev_requests.projects import migrate_legacy_dir
+
+    assert migrate_legacy_dir(tmp_path / ".dev_requests", tmp_path / ".reqresp") is False
+    assert not (tmp_path / ".dev_requests").exists()

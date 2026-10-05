@@ -5,11 +5,13 @@ __pycache__/
 .pytest_cache/
 
 # Dados de projetos nunca são versionados (podem ter tokens e variáveis secretas)
+.dev_requests/
 .reqresp/
 projects/
 globals.json
 history.json
 # Projetos exportados pelo app
+*.dev_requests.json
 *.reqresp.json
 *.insomnia.json
 *.insomnia.yaml

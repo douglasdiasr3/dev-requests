@@ -3,14 +3,24 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from reqresp.models import RequestSpec
+from dev_requests.models import RequestSpec
 
-DEFAULT_BASE_DIR = Path.home() / ".reqresp"
+DEFAULT_BASE_DIR = Path.home() / ".dev_requests"
+LEGACY_BASE_DIR = Path.home() / ".reqresp"  # pasta de quando o app se chamava reqresp
 ID_RE = re.compile(r"^[0-9a-f]{1,32}$")
+
+
+def migrate_legacy_dir(base: Path = DEFAULT_BASE_DIR, legacy: Path = LEGACY_BASE_DIR) -> bool:
+    """Na primeira execução, copia os dados da pasta antiga. A antiga fica como backup."""
+    if base.exists() or not legacy.is_dir():
+        return False
+    shutil.copytree(legacy, base)
+    return True
 
 
 def new_id() -> str:
@@ -187,7 +197,7 @@ class ProjectStore:
             for var in env["variables"]:
                 if var["secret"]:
                     var["value"] = ""
-        data["reqresp_export"] = 1
+        data["dev_requests_export"] = 1
         return data
 
     def import_(self, data: dict) -> Project:

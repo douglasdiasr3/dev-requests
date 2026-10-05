@@ -9,23 +9,23 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from reqresp import insomnia
-from reqresp.history import DEFAULT_PATH, History
-from reqresp.http_client import send
-from reqresp.models import RequestSpec
-from reqresp.projects import Project, ProjectStore, Variable
-from reqresp.variables import build_variables, resolve
+from dev_requests import insomnia
+from dev_requests.history import DEFAULT_PATH, History
+from dev_requests.http_client import send
+from dev_requests.models import RequestSpec
+from dev_requests.projects import Project, ProjectStore, Variable, migrate_legacy_dir
+from dev_requests.variables import build_variables, resolve
 
 STATIC_DIR = Path(__file__).parent / "static"
 ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 MAX_IMPORT_BYTES = 20 * 1024 * 1024
 # Exigir este header força um preflight CORS, então outros sites abertos no
 # navegador não conseguem usar o servidor local como proxy.
-CLIENT_HEADER = "x-reqresp"
+CLIENT_HEADER = "x-dev-requests"
 
 
 def create_app(history_path: Path = DEFAULT_PATH) -> FastAPI:
-    app = FastAPI(title="reqresp", docs_url=None, redoc_url=None)
+    app = FastAPI(title="dev_requests", docs_url=None, redoc_url=None)
     history = History(history_path)
     history.load()
     store = ProjectStore(history_path.parent)
@@ -95,10 +95,10 @@ def create_app(history_path: Path = DEFAULT_PATH) -> FastAPI:
         return {"ok": True}
 
     @app.get("/api/projects/{project_id}/export")
-    async def api_export_project(project_id: str, format: str = "reqresp"):
+    async def api_export_project(project_id: str, format: str = "dev_requests"):
         get_project(project_id)
         data = store.export(project_id)  # já sem os valores secretos
-        if format == "reqresp":
+        if format == "dev_requests":
             return data
         project = Project.from_dict(data)
         if format == "insomnia-v4":
@@ -115,7 +115,7 @@ def create_app(history_path: Path = DEFAULT_PATH) -> FastAPI:
         try:
             data = insomnia.load_any(raw.decode("utf-8-sig"))
             kind = insomnia.detect(data)
-            if kind == "reqresp":
+            if kind == "dev_requests":
                 projects, warnings = [store.import_(data)], []
             else:
                 result = insomnia.import_insomnia(data)
@@ -161,17 +161,19 @@ def main() -> None:
 
     import uvicorn
 
-    parser = argparse.ArgumentParser(description="reqresp: cliente HTTP no navegador")
+    parser = argparse.ArgumentParser(description="dev_requests: cliente HTTP no navegador")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--no-browser", action="store_true", help="não abrir o navegador")
     parser.add_argument(
         "--data-dir", type=Path, default=DEFAULT_PATH.parent,
-        help="pasta onde ficam projetos, variáveis e histórico (padrão: ~/.reqresp)",
+        help="pasta onde ficam projetos, variáveis e histórico (padrão: ~/.dev_requests)",
     )
     args = parser.parse_args()
 
+    if args.data_dir.expanduser() == DEFAULT_PATH.parent and migrate_legacy_dir():
+        print("Dados copiados de ~/.reqresp para ~/.dev_requests (a pasta antiga foi mantida).")
     url = f"http://127.0.0.1:{args.port}"
-    print(f"reqresp rodando em {url}  (ctrl+c para sair)")
+    print(f"dev_requests rodando em {url}  (ctrl+c para sair)")
     if not args.no_browser:
         threading.Timer(0.8, webbrowser.open, args=(url,)).start()
     app = create_app(args.data_dir.expanduser() / "history.json")

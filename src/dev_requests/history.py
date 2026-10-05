@@ -5,9 +5,9 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-from reqresp.models import RequestSpec, ResponseData
+from dev_requests.models import RequestSpec, ResponseData
 
-DEFAULT_PATH = Path.home() / ".reqresp" / "history.json"
+DEFAULT_PATH = Path.home() / ".dev_requests" / "history.json"
 MAX_ENTRIES = 50
 
 

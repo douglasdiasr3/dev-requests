@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import ReqProjects from "../../src/reqresp/web/static/projects.js";
+import ReqProjects from "../../src/dev_requests/web/static/projects.js";
 
 const { resolveText, findVariables, buildVariables, jsonForValidation, comparable } = ReqProjects;
 

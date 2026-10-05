@@ -1,11 +1,11 @@
-# reqresp
+# dev_requests
 
 Cliente HTTP simplificado, no estilo do Insomnia, em Python. A interface principal abre no navegador (FastAPI + HTML/JS, sem etapa de build) e há também uma versão para o terminal ([Textual](https://textual.textualize.io)). As requisições ## Uso
 
 ```bash
-.venv/bin/reqresp              # abre a interface no navegador (http://127.0.0.1:8765)
-.venv/bin/reqresp --port 9000  # outra porta
-.venv/bin/reqresp-tui          # versão para o terminal
+.venv/bin/dev_requests              # abre a interface no navegador (http://127.0.0.1:8765)
+.venv/bin/dev_requests --port 9000  # outra porta
+.venv/bin/dev_requests_tui          # versão para o terminal
 ```
 
 O servidor só escuta em `127.0.0.1`. Para sair, aperte `ctrl+c` no terminal.
@@ -22,14 +22,15 @@ O servidor só escuta em `127.0.0.1`. Para sair, aperte `ctrl+c` no terminal.
   - A linha abaixo da URL mostra como ela vai ficar. Variáveis não definidas aparecem em vermelho e também geram um aviso na resposta.
 - **Variáveis secretas** (🔒): aparecem mascaradas na tela e vão vazias ao exportar o projeto.
   - O histórico sempre guarda a requisição com os `{{placeholders}}`, nunca os valores.
-- **Insomnia**: o menu `⋯` exporta para o Insomnia em **YAML v5** (formato atual) ou **JSON v4** (legado, também aceito por outras ferramentas). **Importar…** aceita arquivos do reqresp e do Insomnia (v4 e v5) e detecta o formato sozinho.
+- **Insomnia**: o menu `⋯` exporta para o Insomnia em **YAML v5** (formato atual) ou **JSON v4** (legado, também aceito por outras ferramentas). **Importar…** aceita arquivos do dev_requests e do Insomnia (v4 e v5) e detecta o formato sozinho.
   - Pastas viram nomes como `Pasta / Sub / Requisição`, e headers e auth da pasta são copiados para as requisições.
   - O Base Environment é mesclado em cada sub-ambiente, e `{{ _.var }}` vira `{{var}}` (e o contrário ao exportar).
-  - O que o reqresp não suporta (multipart, OAuth 2, WebSocket/gRPC, tags `{% … %}`) é listado num aviso ao final da importação.
+  - O que o dev_requests não suporta (multipart, OAuth 2, WebSocket/gRPC, tags `{% … %}`) é listado num aviso ao final da importação.
 - **Onde fica salvo**:
-  - projetos: `~/.reqresp/projects/<id>.json`
-  - variáveis globais: `~/.reqresp/globals.json`
-  - para usar outra pasta: `reqresp --data-dir caminho/`
+  - projetos: `~/.dev_requests/projects/<id>.json`
+  - variáveis globais: `~/.dev_requests/globals.json`
+  - na primeira execução, os dados da pasta antiga `~/.reqresp` (de quando o app se chamava reqresp) são copiados para `~/.dev_requests`; a antiga fica como backup
+  - para usar outra pasta: `dev_requests --data-dir caminho/`
 
 ### Interface web
 
@@ -62,10 +63,10 @@ O servidor só escuta em `127.0.0.1`. Para sair, aperte `ctrl+c` no terminal.
 | `ctrl+l` | Limpar o histórico |
 | `ctrl+q` | Sair |
 
-As duas versões usam o mesmo histórico (`~/.reqresp/history.json`).
+As duas versões usam o mesmo histórico (`~/.dev_requests/history.json`).
 
 ken ou Basic Auth.
-- **Histórico**: as últimas 50 requisições ficam salvas em `~/.reqresp/history.json`. Selecione uma para recarregá-la.
+- **Histórico**: as últimas 50 requisições ficam salvas em `~/.dev_requests/history.json`. Selecione uma para recarregá-la.
 
 ## Testes
 

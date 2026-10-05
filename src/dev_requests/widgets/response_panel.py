@@ -6,7 +6,7 @@ from textual.app import ComposeResult
 from textual.containers import Vertical
 from textual.widgets import DataTable, LoadingIndicator, Static, TabbedContent, TabPane, TextArea
 
-from reqresp.models import ResponseData
+from dev_requests.models import ResponseData
 
 
 def format_size(n: int) -> str:

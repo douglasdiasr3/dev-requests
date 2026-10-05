@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import ReqSearch from "../../src/reqresp/web/static/search.js";
+import ReqSearch from "../../src/dev_requests/web/static/search.js";
 
 const { findMatches, splitRanges } = ReqSearch;
 

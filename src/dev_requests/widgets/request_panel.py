@@ -5,8 +5,8 @@ from textual.containers import Horizontal, Vertical
 from textual.message import Message
 from textual.widgets import Button, Input, Label, Select, TabbedContent, TabPane, TextArea
 
-from reqresp.models import METHODS, AuthConfig, RequestSpec
-from reqresp.widgets.kv_editor import KVEditor
+from dev_requests.models import METHODS, AuthConfig, RequestSpec
+from dev_requests.widgets.kv_editor import KVEditor
 
 
 class RequestPanel(Vertical):

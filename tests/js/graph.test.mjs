@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import ReqGraph from "../../src/reqresp/web/static/graph.js";
+import ReqGraph from "../../src/dev_requests/web/static/graph.js";
 
 const { buildGraph, layout, autoCollapse } = ReqGraph;
 

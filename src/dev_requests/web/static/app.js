@@ -5,10 +5,10 @@ const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
 const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform);
 const SEND_SHORTCUT = IS_MAC ? "⌘ ↵" : "Ctrl ↵";
-const DRAFT_KEY = "reqresp:draft";
-const THEME_KEY = "reqresp:theme";
-const VIEW_KEY = "reqresp:viewMode";
-const HISTORY_COLLAPSED_KEY = "reqresp:historyCollapsed";
+const DRAFT_KEY = "dev_requests:draft";
+const THEME_KEY = "dev_requests:theme";
+const VIEW_KEY = "dev_requests:viewMode";
+const HISTORY_COLLAPSED_KEY = "dev_requests:historyCollapsed";
 const HIGHLIGHT_LIMIT = 400_000;
 
 let projectsUI = null;
@@ -30,7 +30,12 @@ const state = {
 // ---------- utilidades ----------
 
 function storageGet(key) {
-  try { return localStorage.getItem(key); } catch { return null; }
+  try {
+    // Cai na chave antiga para não perder o que foi salvo quando o app se chamava reqresp.
+    return localStorage.getItem(key) ?? localStorage.getItem(key.replace(/^dev_requests:/, "reqresp:"));
+  } catch {
+    return null;
+  }
 }
 function storageSet(key, value) {
   try { localStorage.setItem(key, value); } catch { /* armazenamento indisponível */ }
@@ -315,7 +320,7 @@ function updateMethodColor() {
 async function api(path, options = {}) {
   const res = await fetch(path, {
     ...options,
-    headers: { "X-ReqResp": "1", "Content-Type": "application/json", ...(options.headers || {}) },
+    headers: { "X-Dev-Requests": "1", "Content-Type": "application/json", ...(options.headers || {}) },
   });
   if (!res.ok) throw new Error(`Servidor respondeu ${res.status}`);
   return res.json();

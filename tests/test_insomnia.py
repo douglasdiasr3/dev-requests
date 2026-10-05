@@ -3,9 +3,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-from reqresp import insomnia
-from reqresp.models import AuthConfig, RequestSpec
-from reqresp.projects import Environment, Project, SavedRequest, Variable
+from dev_requests import insomnia
+from dev_requests.models import AuthConfig, RequestSpec
+from dev_requests.projects import Environment, Project, SavedRequest, Variable
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -28,7 +28,7 @@ def env_vars(project, env_name):
 def test_detect_formats():
     assert insomnia.detect(load("insomnia_v4.json")) == "insomnia-v4"
     assert insomnia.detect(load("insomnia_v5.yaml")) == "insomnia-v5"
-    assert insomnia.detect({"name": "x", "requests": [], "environments": []}) == "reqresp"
+    assert insomnia.detect({"name": "x", "requests": [], "environments": []}) == "dev_requests"
     with pytest.raises(ValueError, match="formato não reconhecido"):
         insomnia.detect({"foo": 1})
     with pytest.raises(ValueError, match="só um ambiente"):

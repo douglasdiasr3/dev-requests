@@ -1,5 +1,5 @@
-from reqresp.history import History
-from reqresp.models import AuthConfig, RequestSpec, ResponseData
+from dev_requests.history import History
+from dev_requests.models import AuthConfig, RequestSpec, ResponseData
 
 
 def test_roundtrip(tmp_path):

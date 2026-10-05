@@ -6,7 +6,7 @@ from rich.text import Text
 from textual.message import Message
 from textual.widgets import Label, ListItem, ListView
 
-from reqresp.history import HistoryEntry
+from dev_requests.history import HistoryEntry
 
 STATUS_STYLES = {2: "green", 3: "cyan", 4: "yellow", 5: "red"}
 

@@ -1,11 +1,11 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from reqresp.models import ResponseData
-from reqresp.web import server
-from reqresp.web.server import create_app
+from dev_requests.models import ResponseData
+from dev_requests.web import server
+from dev_requests.web.server import create_app
 
-HEADERS = {"X-ReqResp": "1"}
+HEADERS = {"X-Dev-Requests": "1"}
 
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def client(tmp_path):
 def test_index_served(client):
     res = client.get("/")
     assert res.status_code == 200
-    assert "reqresp" in res.text
+    assert "dev_requests" in res.text
 
 
 def test_send_and_history(client, monkeypatch):
@@ -120,11 +120,11 @@ def test_import_insomnia_files(client, fixture, fmt, name):
     assert project["requests"][0]["name"] == "Listar produtos"
 
 
-def test_import_reqresp_and_invalid(client):
+def test_import_dev_requests_and_invalid(client):
     pid = client.get("/api/projects", headers=HEADERS).json()[0]["id"]
     exported = client.get(f"/api/projects/{pid}/export", headers=HEADERS).text
     res = client.post("/api/import", headers=HEADERS, content=exported.encode())
-    assert res.json()["format"] == "reqresp"
+    assert res.json()["format"] == "dev_requests"
 
     bad = client.post("/api/import", headers=HEADERS, content=b"isso nao e um export")
     assert bad.status_code == 400

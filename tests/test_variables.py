@@ -1,6 +1,6 @@
-from reqresp.models import AuthConfig, RequestSpec
-from reqresp.projects import Variable
-from reqresp.variables import build_variables, resolve, resolve_text
+from dev_requests.models import AuthConfig, RequestSpec
+from dev_requests.projects import Variable
+from dev_requests.variables import build_variables, resolve, resolve_text
 
 
 def test_resolves_all_fields():

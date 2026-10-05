@@ -4,8 +4,8 @@ import json
 import httpx
 import respx
 
-from reqresp.http_client import send
-from reqresp.models import AuthConfig, RequestSpec
+from dev_requests.http_client import send
+from dev_requests.models import AuthConfig, RequestSpec
 
 
 @respx.mock

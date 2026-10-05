@@ -6,7 +6,7 @@
   const VAR_RE = /\{\{\s*([A-Za-z0-9_.\-]+)\s*\}\}/g;
   const MAX_PASSES = 3;
   const SAVE_DELAY = 400;
-  const OPEN_KEY = "reqresp:open";
+  const OPEN_KEY = "dev_requests:open";
 
   // ---------- funções puras ----------
 
@@ -412,15 +412,15 @@
     }
 
     const EXPORTS = {
-      reqresp: { ext: "reqresp.json", type: "application/json", label: "reqresp" },
+      dev_requests: { ext: "dev_requests.json", type: "application/json", label: "dev_requests" },
       "insomnia-v5": { ext: "insomnia.yaml", type: "application/yaml", label: "Insomnia (YAML v5)" },
       "insomnia-v4": { ext: "insomnia.json", type: "application/json", label: "Insomnia (JSON v4)" },
     };
 
     async function exportProject(format) {
-      const info = EXPORTS[format] ?? EXPORTS.reqresp;
+      const info = EXPORTS[format] ?? EXPORTS.dev_requests;
       const res = await fetch(`/api/projects/${s.project.id}/export?format=${encodeURIComponent(format)}`, {
-        headers: { "X-ReqResp": "1" },
+        headers: { "X-Dev-Requests": "1" },
       });
       if (!res.ok) throw new Error(`Servidor respondeu ${res.status}`);
       let text = await res.text();
@@ -468,7 +468,7 @@
       }
     }
 
-    const FORMAT_LABELS = { reqresp: "reqresp", "insomnia-v4": "Insomnia (JSON v4)", "insomnia-v5": "Insomnia (YAML v5)" };
+    const FORMAT_LABELS = { dev_requests: "dev_requests", "insomnia-v4": "Insomnia (JSON v4)", "insomnia-v5": "Insomnia (YAML v5)" };
 
     async function importFile(file) {
       if (!(await confirmDiscard())) return;
@@ -476,7 +476,7 @@
       try {
         const res = await fetch("/api/import", {
           method: "POST",
-          headers: { "X-ReqResp": "1", "Content-Type": "text/plain; charset=utf-8" },
+          headers: { "X-Dev-Requests": "1", "Content-Type": "text/plain; charset=utf-8" },
           body: await file.text(),
         });
         result = await res.json().catch(() => ({}));
@@ -709,7 +709,7 @@
       window.addEventListener("pagehide", () => {
         const send = (url, body) => fetch(url, {
           method: "PUT", keepalive: true, body: JSON.stringify(body),
-          headers: { "X-ReqResp": "1", "Content-Type": "application/json" },
+          headers: { "X-Dev-Requests": "1", "Content-Type": "application/json" },
         });
         if (s.pendingSave && s.project) send(`/api/projects/${s.project.id}`, s.project);
         if (s.globalsPending) send("/api/globals", s.globals);

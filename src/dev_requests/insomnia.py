@@ -1,8 +1,8 @@
-"""Conversão entre projetos do reqresp e os formatos de exportação do Insomnia.
+"""Conversão entre projetos do dev_requests e os formatos de exportação do Insomnia.
 
 Suporta o formato atual (YAML v5, `type: collection.insomnia.rest/5.0`) e o
 legado (JSON v4, `_type: export`). O Insomnia organiza requisições em pastas e
-tem um "Base Environment" com sub-ambientes; o reqresp tem uma lista simples e
+tem um "Base Environment" com sub-ambientes; o dev_requests tem uma lista simples e
 ambientes independentes, então a importação achata pastas (o nome vira
 "Pasta / Requisição") e mescla a base em cada sub-ambiente.
 """
@@ -18,9 +18,9 @@ from urllib.parse import quote
 
 import yaml
 
-from reqresp.models import AuthConfig, RequestSpec
-from reqresp.projects import Environment, Project, SavedRequest, Variable
-from reqresp.variables import VAR_RE
+from dev_requests.models import AuthConfig, RequestSpec
+from dev_requests.projects import Environment, Project, SavedRequest, Variable
+from dev_requests.variables import VAR_RE
 
 INSOMNIA_VAR_RE = re.compile(r"\{\{\s*_\.([A-Za-z0-9_.\-]+)\s*\}\}")
 TAG_RE = re.compile(r"\{%\s*([A-Za-z0-9_]+)")
@@ -48,8 +48,8 @@ def detect(data) -> str:
         if kind.startswith("environment.insomnia.rest/5"):
             raise ValueError("este arquivo do Insomnia contém só um ambiente; exporte a coleção inteira")
         if isinstance(data.get("requests"), list) and isinstance(data.get("environments"), list):
-            return "reqresp"
-    raise ValueError("formato não reconhecido: esperava um export do reqresp ou do Insomnia (v4 ou v5)")
+            return "dev_requests"
+    raise ValueError("formato não reconhecido: esperava um export do dev_requests ou do Insomnia (v4 ou v5)")
 
 
 # ---------- avisos ----------
@@ -88,7 +88,7 @@ def from_insomnia_template(text, warnings: Warnings | None = None) -> str:
     text = VAR_RE.sub(r"{{\1}}", text)
     if warnings is not None:
         for tag in TAG_RE.findall(text):
-            warnings.add("Tags do Insomnia mantidas como texto (o reqresp não as executa)", f"{{% {tag} %}}")
+            warnings.add("Tags do Insomnia mantidas como texto (o dev_requests não as executa)", f"{{% {tag} %}}")
     return text
 
 
@@ -222,7 +222,7 @@ def _convert_request(raw: dict, path: list[str], inherited_headers, inherited_au
 
     body, body_type = _convert_body(raw.get("body") or {}, headers, name, warnings)
     if body_type == "json":
-        # O reqresp define Content-Type: application/json sozinho para body JSON.
+        # O dev_requests define Content-Type: application/json sozinho para body JSON.
         headers = [(k, v) for k, v in headers if not (k.lower() == "content-type" and v.lower().startswith(JSON_MIME))]
 
     auth_raw = raw.get("authentication") or {}
@@ -455,7 +455,7 @@ def to_v4(project: Project) -> dict:
         "_type": "export",
         "__export_format": 4,
         "__export_date": time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime()),
-        "__export_source": "reqresp",
+        "__export_source": "dev_requests",
         "resources": resources,
     }
 

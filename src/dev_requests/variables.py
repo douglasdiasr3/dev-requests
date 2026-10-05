@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from dataclasses import replace
 
-from reqresp.models import AuthConfig, RequestSpec
+from dev_requests.models import AuthConfig, RequestSpec
 
 VAR_RE = re.compile(r"\{\{\s*([A-Za-z0-9_.\-]+)\s*\}\}")
 MAX_PASSES = 3
