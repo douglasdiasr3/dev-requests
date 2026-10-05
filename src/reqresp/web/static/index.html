@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>reqresp</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%237c5cff'/><path d='M9 12h12l-3-3M23 20H11l3 3' stroke='white' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="8"/><path d="M9 12h12l-3-3M23 20H11l3 3"/></svg>
+      </span>
+      reqresp
+    </div>
+    <div class="workspace">
+      <label class="ws-field" title="Projeto">
+        <span class="ws-label">Projeto</span>
+        <select id="project-select" aria-label="Projeto"></select>
+      </label>
+      <div class="menu-wrap">
+        <button class="ghost icon" id="project-menu-btn" title="Opções do projeto" aria-label="Opções do projeto">⋯</button>
+        <div class="menu" id="project-menu" hidden>
+          <button data-act="new">Novo projeto…</button>
+          <button data-act="rename">Renomear projeto…</button>
+          <hr>
+          <div class="menu-label">Exportar</div>
+          <button data-act="export" data-format="reqresp">reqresp <span class="menu-ext">.json</span></button>
+          <button data-act="export" data-format="insomnia-v5">Insomnia — YAML v5 <span class="menu-ext">.yaml</span></button>
+          <button data-act="export" data-format="insomnia-v4">Insomnia — JSON v4 <span class="menu-ext">.json</span></button>
+          <hr>
+          <button data-act="import">Importar… <span class="menu-ext">reqresp ou Insomnia</span></button>
+          <hr>
+          <button data-act="delete" class="danger-text">Excluir projeto…</button>
+        </div>
+        <input type="file" id="import-file" accept=".json,.yaml,.yml,application/json,application/yaml" hidden>
+      </div>
+      <label class="ws-field" title="Ambiente ativo">
+        <span class="ws-label">Ambiente</span>
+        <select id="env-select" aria-label="Ambiente"></select>
+      </label>
+      <button class="ghost" id="vars-btn" title="Gerenciar ambientes e variáveis">{{ }} Variáveis</button>
+    </div>
+    <div class="topbar-actions">
+      <button class="ghost" id="new-request" title="Nova requisição">+ Nova</button>
+      <button class="ghost icon" id="theme-toggle" title="Alternar tema" aria-label="Alternar tema"></button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <section class="side-section" id="saved-section">
+        <div class="sidebar-head" id="saved-head">
+          <span class="section-toggle">Requisições <span class="count" id="saved-count"></span></span>
+        </div>
+        <ul class="saved" id="saved-list"></ul>
+        <p class="history-empty" id="saved-empty">Nenhuma requisição salva ainda. Use <b>Salvar</b> (<kbd>⌘S</kbd>) para guardar a atual neste projeto.</p>
+      </section>
+      <section class="side-section" id="history-section">
+      <div class="sidebar-head" id="history-head">
+        <span class="section-toggle">Histórico</span>
+        <button class="link" id="clear-history">Limpar</button>
+      </div>
+      <input class="search" id="history-search" type="search" placeholder="Filtrar histórico…">
+      <ul class="history" id="history"></ul>
+      <p class="history-empty" id="history-empty">As requisições enviadas aparecem aqui.</p>
+      </section>
+    </aside>
+
+    <main class="main">
+      <form class="urlbar" id="urlbar" autocomplete="off">
+        <select id="method" aria-label="Método">
+          <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option>
+          <option>DELETE</option><option>HEAD</option><option>OPTIONS</option>
+        </select>
+        <input id="url" type="text" spellcheck="false" placeholder="https://api.exemplo.com/recurso" aria-label="URL">
+        <button type="button" class="ghost save-btn" id="save" title="Salvar no projeto">Salvar<span class="save-dot" aria-hidden="true"></span></button>
+        <button type="submit" class="primary" id="send">
+          <span class="send-label">Enviar</span>
+          <kbd class="send-kbd" id="send-kbd"></kbd>
+        </button>
+      </form>
+      <div class="url-meta">
+        <span class="current-name" id="current-name" hidden></span>
+        <div class="url-preview" id="url-preview" hidden></div>
+      </div>
+
+      <div class="panes">
+        <section class="pane" aria-label="Requisição">
+          <nav class="tabs" data-tabs="req">
+            <button data-tab="params" class="active">Params <span class="count" id="count-params"></span></button>
+            <button data-tab="headers">Headers <span class="count" id="count-headers"></span></button>
+            <button data-tab="body">Body <span class="dot" id="dot-body"></span></button>
+            <button data-tab="auth">Auth <span class="dot" id="dot-auth"></span></button>
+          </nav>
+
+          <div class="tab-panel active" data-panel="req:params">
+            <p class="hint">Parâmetros de query. Ficam sincronizados com a URL.</p>
+            <div class="kv" id="kv-params"></div>
+          </div>
+
+          <div class="tab-panel" data-panel="req:headers">
+            <p class="hint">Headers enviados na requisição.</p>
+            <div class="kv" id="kv-headers"></div>
+          </div>
+
+          <div class="tab-panel" data-panel="req:body">
+            <div class="toolbar">
+              <div class="segmented" id="body-type">
+                <button data-value="none" class="active">Nenhum</button>
+                <button data-value="json">JSON</button>
+                <button data-value="text">Texto</button>
+              </div>
+              <button class="ghost small" id="format-json">Formatar JSON</button>
+            </div>
+            <div class="body-editor" id="body-editor">
+              <textarea id="body" spellcheck="false" placeholder='{ "chave": "valor" }'></textarea>
+              <p class="validation" id="body-validation"></p>
+            </div>
+            <p class="empty-note" id="body-empty">Esta requisição não envia body.</p>
+          </div>
+
+          <div class="tab-panel" data-panel="req:auth">
+            <div class="toolbar">
+              <div class="segmented" id="auth-type">
+                <button data-value="none" class="active">Nenhuma</button>
+                <button data-value="bearer">Bearer Token</button>
+                <button data-value="basic">Basic Auth</button>
+              </div>
+            </div>
+            <div class="auth-fields" data-auth="bearer">
+              <label>Token
+                <span class="secret"><input id="auth-token" type="password" spellcheck="false" placeholder="eyJhbGciOi…"><button type="button" class="reveal" tabindex="-1">mostrar</button></span>
+              </label>
+              <p class="hint">Enviado como <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+            </div>
+            <div class="auth-fields" data-auth="basic">
+              <label>Usuário <input id="auth-username" type="text" spellcheck="false"></label>
+              <label>Senha
+                <span class="secret"><input id="auth-password" type="password"><button type="button" class="reveal" tabindex="-1">mostrar</button></span>
+              </label>
+            </div>
+            <p class="empty-note" data-auth="none">Nenhuma autenticação será enviada.</p>
+          </div>
+        </section>
+
+        <section class="pane response" aria-label="Resposta">
+          <div class="resp-status" id="resp-status">
+            <span class="pill" id="resp-pill"></span>
+            <span class="meta" id="resp-time"></span>
+            <span class="meta" id="resp-size"></span>
+            <span class="resp-warn" id="resp-warn" hidden></span>
+          </div>
+          <nav class="tabs" data-tabs="resp">
+            <button data-tab="body" class="active">Body</button>
+            <button data-tab="headers">Headers <span class="count" id="count-resp-headers"></span></button>
+            <span class="tabs-spacer"></span>
+            <div class="segmented small" id="view-mode">
+              <button data-value="pretty" class="active">Formatado</button>
+              <button data-value="raw">Bruto</button>
+              <button data-value="graph" title="Ver o JSON como diagrama">Gráfico</button>
+            </div>
+            <button class="ghost small" id="copy-body">Copiar</button>
+          </nav>
+          <div class="resp-search" id="resp-search">
+            <input type="search" id="resp-search-input" placeholder="Buscar na resposta" spellcheck="false" autocomplete="off" aria-label="Buscar na resposta">
+            <span class="resp-search-count" id="resp-search-count"></span>
+            <button type="button" class="ghost icon small" id="resp-search-prev" title="Anterior (Shift+Enter)" aria-label="Ocorrência anterior">↑</button>
+            <button type="button" class="ghost icon small" id="resp-search-next" title="Próxima (Enter)" aria-label="Próxima ocorrência">↓</button>
+          </div>
+
+          <div class="resp-content">
+            <div class="placeholder" id="resp-placeholder">
+              <div class="placeholder-icon" aria-hidden="true">⇄</div>
+              <p>Envie uma requisição para ver a resposta aqui.</p>
+              <p class="hint">Atalho: <kbd id="placeholder-kbd"></kbd></p>
+            </div>
+            <div class="loading" id="resp-loading">
+              <div class="spinner"></div>
+              <p>Enviando…</p>
+              <button class="ghost small" id="cancel">Cancelar</button>
+            </div>
+            <div class="error-box" id="resp-error"></div>
+            <div class="tab-panel active" data-panel="resp:body">
+              <pre class="code" id="resp-body"></pre>
+              <div id="resp-graph" hidden></div>
+            </div>
+            <div class="tab-panel" data-panel="resp:headers">
+              <table class="headers-table"><tbody id="resp-headers"></tbody></table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="vars-modal" hidden>
+    <div class="modal vars-modal" role="dialog" aria-modal="true" aria-labelledby="vars-title">
+      <aside class="env-pane">
+        <ul class="env-list" id="env-list"></ul>
+        <button class="ghost small" data-env-act="new">+ Novo ambiente</button>
+      </aside>
+      <section class="vars-pane">
+        <header class="vars-head">
+          <div>
+            <h3 id="vars-title">Variáveis</h3>
+            <p class="hint" id="vars-hint"></p>
+          </div>
+          <button class="ghost icon" id="vars-close" title="Fechar (Esc)" aria-label="Fechar">✕</button>
+        </header>
+        <div class="vars-actions">
+          <button class="ghost small env-only" data-env-act="activate">Usar este ambiente</button>
+          <button class="ghost small env-only" data-env-act="rename">Renomear</button>
+          <button class="ghost small env-only" data-env-act="duplicate">Duplicar</button>
+          <button class="ghost small env-only danger-text" data-env-act="delete">Excluir</button>
+        </div>
+        <div class="vars-rows" id="vars-rows"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="dialog" hidden>
+    <div class="modal dialog" role="dialog" aria-modal="true">
+      <h3 class="dialog-title"></h3>
+      <p class="dialog-message"></p>
+      <ul class="dialog-details" hidden></ul>
+      <input class="dialog-input" type="text" spellcheck="false">
+      <div class="dialog-actions">
+        <button type="button" class="ghost dialog-cancel">Cancelar</button>
+        <button type="button" class="primary dialog-confirm">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/static/graph.js"></script>
+  <script src="/static/projects.js"></script>
+  <script src="/static/search.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

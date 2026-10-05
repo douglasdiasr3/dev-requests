@@ -1,0 +1,78 @@
+#sidebar {
+    width: 36;
+    border-right: solid $primary-background;
+}
+
+.panel-title {
+    width: 100%;
+    padding: 0 1;
+    background: $primary-background;
+    text-style: bold;
+}
+
+#history {
+    height: 1fr;
+}
+
+#main {
+    width: 1fr;
+}
+
+#request {
+    height: 1fr;
+}
+
+#url-bar {
+    height: auto;
+    padding: 0 1;
+}
+
+#method {
+    width: 14;
+}
+
+#url {
+    width: 1fr;
+}
+
+#send {
+    min-width: 10;
+}
+
+#body-type, #auth-type {
+    width: 30;
+    margin-bottom: 1;
+}
+
+#body {
+    height: 1fr;
+}
+
+.auth-fields {
+    height: auto;
+}
+
+#response {
+    height: 1fr;
+    border-top: solid $primary-background;
+}
+
+#status-line {
+    height: 1;
+    padding: 0 1;
+    text-style: bold;
+    color: $text-muted;
+}
+
+#status-line.s2xx { color: $success; }
+#status-line.s3xx { color: $accent; }
+#status-line.s4xx { color: $warning; }
+#status-line.s5xx, #status-line.error { color: $error; }
+
+#loading {
+    height: 1fr;
+}
+
+#resp-body {
+    height: 1fr;
+}

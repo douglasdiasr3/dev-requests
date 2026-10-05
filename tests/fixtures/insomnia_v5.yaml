@@ -1,0 +1,91 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Loja API v5
+meta:
+  id: wrk_abc
+  created: 1741600000000
+  modified: 1741600000000
+collection:
+  - url: "{{ _.base_url }}/produtos?page=1"
+    name: Listar produtos
+    meta:
+      id: req_1
+      sortKey: -20
+    method: GET
+    headers:
+      - name: Accept
+        value: application/json
+    authentication:
+      type: bearer
+      token: "{{ _.token }}"
+  - name: Admin
+    meta:
+      id: fld_1
+      sortKey: -5
+    headers:
+      - name: X-Admin
+        value: "1"
+    authentication:
+      type: basic
+      username: root
+      password: "{{ _.senha }}"
+    children:
+      - url: "{{ _.base_url }}/admin/users"
+        name: Usuários
+        meta:
+          id: req_2
+          sortKey: 1
+        method: DELETE
+        body:
+          mimeType: application/xml
+          text: "<user id=\"1\"/>"
+      - url: "{{ _.base_url }}/admin/ping"
+        name: Ping sem auth
+        meta:
+          id: req_3
+          sortKey: 2
+        method: GET
+        authentication:
+          type: none
+  - url: "{{ _.base_url }}/produtos"
+    name: Criar produto
+    meta:
+      id: req_4
+      sortKey: -10
+    method: POST
+    body:
+      mimeType: application/json
+      text: '{"nome": "Caneca"}'
+    authentication:
+      type: apikey
+      key: api_key
+      value: "{{ _.key }}"
+      addTo: queryParams
+  - name: Socket
+    url: wss://x
+    meta:
+      id: ws-req_1
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_1
+environments:
+  name: Base Environment
+  meta:
+    id: env_base
+  data:
+    base_url: https://api.loja.dev
+    senha: s3cret
+  subEnvironments:
+    - name: Prod
+      meta:
+        id: env_p
+        sortKey: 2
+      data:
+        base_url: https://api.loja.com
+    - name: Dev
+      meta:
+        id: env_d
+        sortKey: 1
+      data:
+        token: dev
